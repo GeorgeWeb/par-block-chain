@@ -10,7 +10,7 @@ using std::to_string;
 
 auto main() -> int {
     block_chain bchain;
-    for (auto i = 1; i < 9u; ++i) {
+    for (auto i = 1; i < 21u; ++i) {
         cout << "Mining block " << i << "..." << endl;
         bchain.add_block(block(i, string("Block ") + to_string(i) + string(" Data")));
     }

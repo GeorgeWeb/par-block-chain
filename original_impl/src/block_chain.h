@@ -43,5 +43,5 @@ class block_chain final {
  public:
     block_chain();
 
-    void add_block(block new_block) noexcept;
+    void add_block(block &&new_block) noexcept;
 };

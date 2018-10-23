@@ -1,5 +1,7 @@
 #pragma once
 
+#include "tpool/tpool.hpp"
+
 #include <string>
 #include <vector>
 
@@ -17,18 +19,24 @@ class block final {
 
     // Hash code of the previous block in the chain.
     std::string prev_hash;
+    std::shared_ptr<tpool::std_queue::thread_pool> pool;
 
  private:
     // The index of the block in the chain.
     uint32_t _index;
+    
     // A modifier used to get a suitable block.
-    uint64_t _nonce;
+    mutable std::shared_ptr<std::atomic<uint64_t>> _nonce;
+    // A flag to check for successful hash calculation.
+    std::shared_ptr<std::atomic<bool>> _modified_hash;
+    
     // Data stored in the block.
     std::string _data;
     // Hash code of this block.
     std::string _hash;
     // Time code block was created.
     long _time;
+    
 
     std::string calculate_hash() const noexcept;
 };
