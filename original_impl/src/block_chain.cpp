@@ -1,9 +1,12 @@
 #include "block_chain.h"
 #include "sha256.h"
 
+#include "../util/timer.hpp"
+#include "../util/file_io.hpp"
+
 #include <iostream>
 #include <sstream>
-#include <chrono>
+#include <limits>
 
 using namespace std;
 using namespace std::chrono;
@@ -18,17 +21,24 @@ block::block(uint32_t index, const string &data)
 
 void block::mine_block(uint32_t difficulty) noexcept {
     string str(difficulty, '0');
+    
+    // define file name
+    string filename("results-original-diff" + std::to_string(difficulty) + ".csv");
 
-    auto start = high_resolution_clock::now();
-
+    // ...
+    util::timer<double, milli> iter_timer{};
+    // calculate the correct hash value
     while (_hash.substr(0, difficulty) != str) {
         ++_nonce;
         _hash = calculate_hash();
     }
 
-    const duration<double, micro> diff = high_resolution_clock::now() - start;
-    const auto execution_time = diff.count();
-    cout << "Block mined: " << _hash << " in " << execution_time << " microseconds" << endl;
+    // end timer and print results
+    const auto execution_time = iter_timer.get_elapsed();
+    cout.precision(std::numeric_limits<double>::max_digits10);
+    cout << "Block mined: " << _hash << " in " << execution_time << endl;
+    // save to file
+    util::file_io::get().save<double>(execution_time, filename);
 }
 
 string block::calculate_hash() const noexcept {
@@ -37,7 +47,11 @@ string block::calculate_hash() const noexcept {
     return sha256(ss.str());
 }
 
-block_chain::block_chain() : _difficulty(3) {
+block_chain::block_chain() : _difficulty(1) {
+    _chain.emplace_back(block(0, "Genesis Block"));
+}
+
+block_chain::block_chain(uint32_t difficulty) : _difficulty(difficulty) {
     _chain.emplace_back(block(0, "Genesis Block"));
 }
 

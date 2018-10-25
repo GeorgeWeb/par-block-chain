@@ -42,6 +42,7 @@ class block_chain final {
 
  public:
     block_chain();
+    explicit block_chain(uint32_t difficulty);
 
     void add_block(block &&new_block) noexcept;
 };

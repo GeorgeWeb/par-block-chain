@@ -16,4 +16,3 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 # link the executable with the threading library's generated imported target
 target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
