@@ -22,7 +22,8 @@ class block final {
     // The index of the block in the chain.
     uint32_t _index;
     // A modifier used to get a suitable block.
-    uint64_t _nonce;
+    mutable uint64_t _nonce;
+    bool _modified_nonce;
     // Data stored in the block.
     std::string _data;
     // Hash code of this block.

@@ -19,7 +19,6 @@ class block final {
 
     // Hash code of the previous block in the chain.
     std::string prev_hash;
-    std::shared_ptr<tpool::std_queue::thread_pool> pool;
 
  private:
     // The index of the block in the chain.
@@ -28,7 +27,7 @@ class block final {
     // A modifier used to get a suitable block.
     mutable std::shared_ptr<std::atomic<uint64_t>> _nonce;
     // A flag to check for successful hash calculation.
-    std::shared_ptr<std::atomic<bool>> _modified_hash;
+    mutable std::shared_ptr<std::atomic<bool>> _modified_hash;
     
     // Data stored in the block.
     std::string _data;
@@ -36,7 +35,6 @@ class block final {
     std::string _hash;
     // Time code block was created.
     long _time;
-    
 
     std::string calculate_hash() const noexcept;
 };

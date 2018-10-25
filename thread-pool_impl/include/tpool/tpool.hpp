@@ -31,10 +31,9 @@
 #include <functional>
 #include <vector>
 #include <queue>
+#include <algorithm>
 
 namespace tpool {
-
-using task = std::function<void()>;
 
 // forward delcaration of the class interface
 template <typename T>
@@ -45,8 +44,8 @@ class thread_pool {
   }
 
   template<typename TFunc, typename... TArgs>
-  auto enqueue(TFunc task, TArgs &&... args) -> std::future<decltype(task(args...))> {
-    return getUnderlying().template enqueue(task, args...);
+  auto add_task(TFunc task, TArgs &&... args) -> std::future<decltype(task(args...))> {
+    return getUnderlying().template add_task(task, args...);
   }
 
  protected:
@@ -66,10 +65,12 @@ namespace std_queue {
 
 // implementation using the standard STL queue container for the tasks
 class thread_pool : public tpool::thread_pool<tpool::std_queue::thread_pool> {
-  public:
+  using task_t = std::function<void()>;
+  
+ public:
   // constuctor with a default number of threads, dependending on your CPU's cores number
   thread_pool() {
-    const auto num_threads = std::thread::hardware_concurrency();
+    const auto num_threads{std::max(std::thread::hardware_concurrency() - 1u, 2u)};
     start(num_threads);
   }
  
@@ -95,7 +96,7 @@ class thread_pool : public tpool::thread_pool<tpool::std_queue::thread_pool> {
   }
 
   template<typename TFunc, typename... TArgs>
-  auto enqueue(TFunc task, TArgs &&...args) -> std::future<decltype(task(args...))> {
+  auto add_task(TFunc task, TArgs &&...args) -> std::future<decltype(task(args...))> {
     /** wrapper to the task,
       * where `packaged_task` is the container for the task function/functor,
       * using `shared_ptr`, because the wrapper is shared between tasks inside the thread pool
@@ -118,7 +119,7 @@ class thread_pool : public tpool::thread_pool<tpool::std_queue::thread_pool> {
     return wrapper->get_future();
   }
 
-private:
+ private:
   /* Internal Member Functions */
 
   void start(size_t num_threads) {
@@ -126,7 +127,7 @@ private:
     for (auto i = 0u; i < num_threads; ++i) { 
       _threads.emplace_back([=] {
         while (true) {
-          task task;
+          task_t task;
 
           /** scoped lock
             * because we don't know how long a task will run and the mutex
@@ -181,7 +182,7 @@ private:
   bool _stopping{false};
   
   // the tasks container
-  std::queue<task> _tasks;
+  std::queue<task_t> _tasks;
 };
 
 } // namespace standard_queue
@@ -231,10 +232,12 @@ class queue {
 
 // implementation using a custom thread-safe queue container for the tasks
 class thread_pool : public tpool::thread_pool<tpool::safe_queue::thread_pool> {
+  using task_t = std::function<void()>;
+
  public:
   // constuctor with a default number of threads, dependending on your CPU's cores number
   thread_pool() {
-    const auto num_threads = std::thread::hardware_concurrency();
+    const auto num_threads{std::max(std::thread::hardware_concurrency() - 1u, 2u)};
     start(num_threads);
   }
  
@@ -260,7 +263,7 @@ class thread_pool : public tpool::thread_pool<tpool::safe_queue::thread_pool> {
   }
 
   template<typename TFunc, typename... TArgs>
-  auto enqueue(TFunc task, TArgs &&...args) -> std::future<decltype(task(args...))> {
+  auto add_task(TFunc task, TArgs &&...args) -> std::future<decltype(task(args...))> {
     /** wrapper to the task,
       * where `packaged_task` is the container for the task (std::function) and returns std::future
       * using `shared_ptr`, because the wrapper is shared between tasks inside the thread pool
@@ -268,7 +271,7 @@ class thread_pool : public tpool::thread_pool<tpool::safe_queue::thread_pool> {
     auto func = std::bind(std::forward<TFunc>(task), std::forward<TArgs>(args)...);
     auto wrapper = std::make_shared<std::packaged_task<decltype(task(args...)) ()>>(func);
 
-     // enqueue the task (the generated parametarised std::function)
+     // add_task the task (the generated parametarised std::function)
     _tasks.push(std::move([wrapper] { (*wrapper)(); }));
 
     // notify an available thread 
@@ -285,7 +288,7 @@ private:
     for (auto i = 0u; i < num_threads; ++i) { 
       _threads.emplace_back([=] {
         while (true) {
-          task task;
+          task_t task;
 
           /** scoped lock
             * because we don't know how long a task will run and the mutex
@@ -339,7 +342,7 @@ private:
   bool _stopping{false};
 
   // the tasks container
-  detail::queue<task> _tasks; 
+  detail::queue<task_t> _tasks; 
 };
 
 } // namespace safe_queue

@@ -26,22 +26,18 @@ void block::mine_block(uint32_t difficulty) noexcept {
         _hash = calculate_hash();
     }
 
-    auto end = high_resolution_clock::now();
-    duration<double, std::milli> diff = end - start;
-    cout << "Block mined: " << _hash << " in " << diff.count() << " milliseconds\n";
+    const duration<double, micro> diff = high_resolution_clock::now() - start;
+    const auto execution_time = diff.count();
+    cout << "Block mined: " << _hash << " in " << execution_time << " microseconds" << endl;
 }
 
 string block::calculate_hash() const noexcept {
-    string buffer;
-	buffer.append(to_string(_index));
-	buffer.append(to_string(_time));
-	buffer.append(_data);
-	buffer.append(to_string(_nonce));
-	buffer.append(prev_hash);
-	return sha256(buffer);
+    stringstream ss;
+    ss << _index << _time << _data << _nonce << prev_hash;
+    return sha256(ss.str());
 }
 
-block_chain::block_chain() : _difficulty(5) {
+block_chain::block_chain() : _difficulty(3) {
     _chain.emplace_back(block(0, "Genesis Block"));
 }
 
