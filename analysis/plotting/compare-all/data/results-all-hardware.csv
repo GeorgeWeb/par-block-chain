@@ -1,0 +1,21 @@
+Average Time Per Block, Difficulty,Technique,Speedup,Efficiency
+0.073559,1,0. Sequential,0,0
+0.81447,2,0. Sequential,0,0
+23.881569,3,0. Sequential,0,0
+209.313393,4,0. Sequential,0,0
+3208.79784,5,0. Sequential,0,0
+0.08299,1,1. OpenMP,0,0
+0.340263,2,1. OpenMP,2.4,0.3
+5.084839,3,1. OpenMP,4.7,0.59
+88.41177,4,1. OpenMP,2.34,0.29
+1508.741113,5,1. OpenMP,2.13,0.27
+0.172363,1,2. Threads + Atomics,0,0
+0.386432,2,2. Threads + Atomics,2.11,0.26
+4.768663,3,2. Threads + Atomics,5,0.63
+93.341323,4,2. Threads + Atomics,2.24,0.28
+1449.15812,5,2. Threads + Atomics,2.21,0.28
+0.219753,1,3. Thread Pool + Futures,0,0
+0.665714,2,3. Thread Pool + Futures,1.22,0.15
+7.619059,3,3. Thread Pool + Futures,3.13,0.39
+108.319578,4,3. Thread Pool + Futures,1.93,0.24
+1646.206875,5,3. Thread Pool + Futures,1.95,0.24
