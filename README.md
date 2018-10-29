@@ -1,14 +1,12 @@
 # Optimising Block-chain Algorithm by adding parallelism
 
 ## Aim
-parallelising a block-chain algorithm using multiple approaches
+The main aim is to present and analyse multiple parallel implementations of the sequential version of the block-chain algorithm via the use of different techniques.
 
 ## Overview
-The main idea of the project is to compare, analyse and discuss the parallelisation 
-of the algorithm with every one of the mentioned methods with the use of helpful tools 
-and techniques and such as profilers, scoped timers and plotting.
+The main idea of the project is to compare, analyse and discuss the parallelisation of the algorithm with every one of the mentioned methods with the use of helpful tools and techniques and such as profilers, scoped timers and plotting.
 
-## Techniques used
+## Parallel techniques
 - OpenMP
 - Multi-Threading with Atomics
 - Thread Pool using Futures
